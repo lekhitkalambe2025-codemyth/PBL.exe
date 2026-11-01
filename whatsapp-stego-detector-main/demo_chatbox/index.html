@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhatsApp Web — Steganography Detector</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2325D366'><path d='M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2z'/></svg>" type="image/svg+xml" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-theme="dark">
+
+<div class="wa-app-wrapper">
+  <div class="wa-top-stripe"></div>
+
+  <!-- Main WhatsApp Web Window -->
+  <div class="wa-window" id="waWindow">
+
+    <!-- Left Navigation Rail (Official WhatsApp Web Style) -->
+    <nav class="wa-nav-rail">
+      <button class="nav-rail-item active" title="Chats">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M19.005 3.175H4.674C3.642 3.175 2.8 4.017 2.8 5.049v10.584c0 1.032.842 1.874 1.874 1.874h1.722v3.318l3.967-3.318h8.642c1.032 0 1.874-.842 1.874-1.874V5.049c0-1.032-.842-1.874-1.874-1.874zm-.126 12.458H9.721l-2.625 2.195v-2.195H4.674V5.049h14.205v10.584z"/>
+        </svg>
+      </button>
+      <button class="nav-rail-item" title="Status">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M12 2.062a9.938 9.938 0 1 0 9.938 9.938A9.95 9.95 0 0 0 12 2.062zm0 18.062a8.125 8.125 0 1 1 8.125-8.125A8.134 8.134 0 0 1 12 20.124z"/>
+        </svg>
+      </button>
+      <button class="nav-rail-item" title="Channels">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2zm1 14.93V18h-2v-1.07A6.007 6.007 0 0 1 6.07 12H5v-2h1.07A6.007 6.007 0 0 1 11 4.07V3h2v1.07A6.007 6.007 0 0 1 17.93 10H19v2h-1.07A6.007 6.007 0 0 1 13 16.93zM12 6a4 4 0 1 0 4 4 4 4 0 0 0-4-4z"/>
+        </svg>
+      </button>
+      <button class="nav-rail-item" title="Communities">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+        </svg>
+      </button>
+      <button class="nav-rail-item" title="Meta AI">
+        <span style="font-size:18px">🔮</span>
+      </button>
+
+      <div class="nav-rail-spacer"></div>
+
+      <!-- View Mode Switcher (Desktop Web vs Phone Frame) -->
+      <button class="nav-rail-item" id="viewModeBtn" title="Toggle Phone Frame Mode">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/>
+        </svg>
+      </button>
+
+      <!-- Theme Switcher (Dark / Light) -->
+      <button class="nav-rail-item" id="themeToggleBtn" title="Toggle Light/Dark Theme">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+        </svg>
+      </button>
+
+      <!-- Profile Avatar -->
+      <div class="nav-rail-avatar" title="You (Investigator)">
+        🛡️
+      </div>
+    </nav>
+
+    <!-- Left Sidebar (Chats List) -->
+    <aside class="wa-sidebar">
+      <div class="sidebar-header">
+        <h2>Chats</h2>
+        <div class="sidebar-actions">
+          <button class="icon-btn" title="New chat">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+          </button>
+          <button class="icon-btn" title="Filter chats">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Search Input -->
+      <div class="sidebar-search-container">
+        <div class="sidebar-search-box">
+          <svg viewBox="0 0 24 24">
+            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+          </svg>
+          <input type="text" placeholder="Search or start new chat" id="sidebarSearchInput" />
+        </div>
+      </div>
+
+      <!-- Filter Chips -->
+      <div class="sidebar-filters">
+        <button class="filter-chip active">All</button>
+        <button class="filter-chip">Unread</button>
+        <button class="filter-chip">Favorites</button>
+        <button class="filter-chip">Groups</button>
+      </div>
+
+      <!-- Chats List -->
+      <div class="chat-list" id="chatList">
+
+        <!-- Chat 1: Alex Rivera -->
+        <div class="chat-item active" data-chat="alex">
+          <div class="chat-avatar alex">
+            AR
+            <span class="online-indicator"></span>
+          </div>
+          <div class="chat-info">
+            <div class="chat-top-row">
+              <span class="chat-name">Alex Rivera (PBL Team)</span>
+              <span class="chat-time">10:33 AM</span>
+            </div>
+            <div class="chat-bottom-row">
+              <span class="chat-preview">
+                <svg viewBox="0 0 16 11" width="14" height="10" fill="#53bdeb">
+                  <path d="M11.07.93a.75.75 0 0 0-1.06 0l-5.72 5.72-2.36-2.36a.75.75 0 0 0-1.06 1.06l2.89 2.89a.75.75 0 0 0 1.06 0l6.25-6.25a.75.75 0 0 0 0-1.06zM15.07.93a.75.75 0 0 0-1.06 0l-5.72 5.72-.8-.8a.75.75 0 1 0-1.06 1.06l1.33 1.33a.75.75 0 0 0 1.06 0l6.25-6.25a.75.75 0 0 0 0-1.06z"/>
+                </svg>
+                Attach or drag an image here to test...
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat 2: Cyber Security Lab -->
+        <div class="chat-item" data-chat="lab">
+          <div class="chat-avatar lab">
+            CS
+          </div>
+          <div class="chat-info">
+            <div class="chat-top-row">
+              <span class="chat-name">Cyber Security Lab 🛡️</span>
+              <span class="chat-time">09:15 AM</span>
+            </div>
+            <div class="chat-bottom-row">
+              <span class="chat-preview">Alex: Document Mode avoids JPEG compression</span>
+              <span class="chat-badge">3</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat 3: Prof. Sharma -->
+        <div class="chat-item" data-chat="prof">
+          <div class="chat-avatar prof">
+            PS
+          </div>
+          <div class="chat-info">
+            <div class="chat-top-row">
+              <span class="chat-name">Prof. Sharma (Evaluation)</span>
+              <span class="chat-time">Yesterday</span>
+            </div>
+            <div class="chat-bottom-row">
+              <span class="chat-preview">Demonstrate detector classification on test sets</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat 4: Saved Notes / Self -->
+        <div class="chat-item" data-chat="saved">
+          <div class="chat-avatar clean">
+            ME
+          </div>
+          <div class="chat-info">
+            <div class="chat-top-row">
+              <span class="chat-name">You (Saved Payloads)</span>
+              <span class="chat-time">Sunday</span>
+            </div>
+            <div class="chat-bottom-row">
+              <span class="chat-preview">Notes for viva: Chi-Square, RS analysis, LSB entropy</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- Right Main Chat Area -->
+    <main class="wa-chat-container" id="chatContainer">
+
+      <!-- Chat Top Header -->
+      <header class="chat-header">
+        <div class="chat-header-contact" id="chatHeaderContact">
+          <div class="chat-header-avatar alex" id="chatHeaderAvatar">AR</div>
+          <div class="chat-header-details">
+            <div class="chat-header-title-row">
+              <span class="chat-header-name" id="chatHeaderName">Alex Rivera (PBL Team)</span>
+              <button class="small-edit-btn" id="editContactBtn" title="Edit Contact Name">✏️</button>
+            </div>
+            <span class="chat-header-status online-text" id="chatHeaderStatus">online</span>
+          </div>
+        </div>
+
+        <div class="chat-header-actions">
+          <!-- Stego Shield Connection Status -->
+          <div class="stego-shield-pill online" id="stegoShieldPill" title="Click to view Model Evaluation & Viva Metrics">
+            <span class="shield-dot"></span>
+            <span id="shieldStatusText">Stego Shield Active • Model Ready</span>
+          </div>
+
+          <!-- Video Call -->
+          <button class="icon-btn" title="Video call">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+            </svg>
+          </button>
+
+          <!-- Voice Call -->
+          <button class="icon-btn" title="Voice call">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-1.57 1.97c-2.83-1.44-5.15-3.75-6.59-6.59l1.97-1.57c.28-.27.36-.67.25-1.02A11.36 11.36 0 0 1 8.57 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.62c0-.55-.45-1-1-1z"/>
+            </svg>
+          </button>
+
+          <!-- Search in Chat -->
+          <button class="icon-btn" title="Search in conversation">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor">
+              <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+          </button>
+
+          <!-- 3-Dots Menu -->
+          <button class="icon-btn" id="menuToggleBtn" title="More options">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor">
+              <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
+          </button>
+
+          <!-- Menu Dropdown -->
+          <div class="dropdown-menu" id="headerDropdown">
+            <button class="dropdown-item" id="openMetricsAction">
+              <span>📊</span> View Model & Viva Metrics
+            </button>
+            <button class="dropdown-item" id="clearChatAction">
+              <span>🗑️</span> Reset Current Conversation
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Chat Messages Canvas -->
+      <div class="chat-messages" id="chatMessages">
+        <!-- Injected dynamically by app.js -->
+      </div>
+
+      <!-- Drag & Drop Visual Overlay -->
+      <div class="chat-dropzone-overlay" id="dropzoneOverlay">
+        <div class="dropzone-icon">📥</div>
+        <div class="dropzone-text">Drop image to send without compression</div>
+        <div class="dropzone-sub">Our local ML model will scan for LSB steganography immediately</div>
+      </div>
+
+      <!-- Floating Attachment Popup Menu -->
+      <div class="attachment-menu" id="attachmentMenu">
+        <button class="attach-menu-item" id="attachPhotos">
+          <div class="attach-icon-circle photos">🖼️</div>
+          <div>
+            <div class="attach-text-title">Photos & Videos</div>
+            <div class="attach-text-sub">Select image from your computer</div>
+          </div>
+        </button>
+
+        <button class="attach-menu-item" id="attachStegoDemo">
+          <div class="attach-icon-circle stego">⚡</div>
+          <div>
+            <div class="attach-text-title">Quick Demo: Stego Image</div>
+            <div class="attach-text-sub">Instant test with JS payload sample</div>
+          </div>
+        </button>
+
+        <button class="attach-menu-item" id="attachCleanDemo">
+          <div class="attach-icon-circle clean">🛡️</div>
+          <div>
+            <div class="attach-text-title">Quick Demo: Clean Image</div>
+            <div class="attach-text-sub">Instant test with clean benchmark</div>
+          </div>
+        </button>
+
+        <button class="attach-menu-item" id="attachDoc">
+          <div class="attach-icon-circle doc">📄</div>
+          <div>
+            <div class="attach-text-title">Document</div>
+            <div class="attach-text-sub">Uncompressed lossless transfer</div>
+          </div>
+        </button>
+      </div>
+
+      <!-- Emoji Picker Popover -->
+      <div class="emoji-popover" id="emojiPopover">
+        <button class="emoji-btn">😀</button>
+        <button class="emoji-btn">😂</button>
+        <button class="emoji-btn">🕵️</button>
+        <button class="emoji-btn">🛡️</button>
+        <button class="emoji-btn">🔍</button>
+        <button class="emoji-btn">⚠️</button>
+        <button class="emoji-btn">✅</button>
+        <button class="emoji-btn">💻</button>
+        <button class="emoji-btn">📊</button>
+        <button class="emoji-btn">🖼️</button>
+        <button class="emoji-btn">⚡</button>
+        <button class="emoji-btn">👍</button>
+      </div>
+
+      <!-- WhatsApp Bottom Composer Bar -->
+      <footer class="chat-composer">
+        <!-- Emoji Button -->
+        <button class="icon-btn" id="emojiBtn" title="Emojis">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
+          </svg>
+        </button>
+
+        <!-- Attachment Paperclip -->
+        <button class="icon-btn" id="attachBtn" title="Attach file or sample">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+            <path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5V6H9v9.5a3.5 3.5 0 0 0 7 0V5c0-2.21-1.79-4-4-4S5 2.79 5 5v12.5c0 3.31 2.69 6 6 6s6-2.69 6-6V6h-1.5z"/>
+          </svg>
+        </button>
+
+        <!-- Hidden System File Input -->
+        <input type="file" id="fileInput" accept="image/*" multiple style="display:none" />
+
+        <!-- Sender Switcher (You / Friend) -->
+        <button class="sender-toggle-btn mode-out" id="senderToggleBtn" title="Click to toggle sender: You / Friend">
+          <span id="senderToggleIcon">👤</span>
+          <span id="senderToggleText">You</span>
+        </button>
+
+        <!-- Text Input Box -->
+        <div class="composer-input-wrapper">
+          <input type="text" id="textInput" class="composer-input" placeholder="Type a message" autocomplete="off" />
+        </div>
+
+        <!-- Dynamic Send / Voice Memo Button -->
+        <button class="send-action-btn" id="sendActionBtn" title="Voice memo">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M11.999 14.942c2.001 0 3.627-1.625 3.627-3.627V5.627C15.626 3.625 14 2 11.999 2 9.998 2 8.372 3.625 8.372 5.627v5.688c0 2.002 1.626 3.627 3.627 3.627zm5.308-3.627c0 2.928-2.38 5.308-5.308 5.308s-5.308-2.38-5.308-5.308H5.163c0 3.493 2.607 6.381 6.012 6.883v3.084h1.649v-3.084c3.405-.502 6.012-3.39 6.012-6.883h-1.529z"/>
+          </svg>
+        </button>
+      </footer>
+    </main>
+
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- Forensic Inspection Modal & Interactive LSB Bitplane Visualizer           -->
+<!-- ========================================================================= -->
+<div class="modal-overlay" id="forensicModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <span style="font-size:20px">🔬</span>
+        <div>
+          <h3>Steganography Forensic Analysis</h3>
+          <span style="font-size:12px;color:var(--wa-text-secondary)" id="modalImgTitle">image.png</span>
+        </div>
+      </div>
+      <button class="icon-btn" id="closeForensicModal">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Left Column: Visual Canvas & Bitplane Switcher -->
+      <div class="inspector-visual-panel">
+        <div class="visual-canvas-container">
+          <canvas id="bitplaneCanvas"></canvas>
+        </div>
+
+        <div class="bitplane-tabs">
+          <button class="bitplane-tab-btn active" data-plane="original">Original Image</button>
+          <button class="bitplane-tab-btn" data-plane="red">Red LSB (Bit 0)</button>
+          <button class="bitplane-tab-btn" data-plane="green">Green LSB (Bit 0)</button>
+          <button class="bitplane-tab-btn" data-plane="blue">Blue LSB (Bit 0)</button>
+          <button class="bitplane-tab-btn" data-plane="all">Combined LSB Parity</button>
+        </div>
+
+        <div class="visual-explanation">
+          <strong>Viva Explanation Tip:</strong>
+          Uncompressed natural images contain subtle spatial gradients and correlations in their least significant bits. 
+          When malicious steganography (LSB substitution) embeds encrypted or random payload bytes, it destroys this correlation, 
+          leaving characteristic high-entropy white noise across bitplane 0.
+        </div>
+      </div>
+
+      <!-- Right Column: Verdict, Latency, Signals Table -->
+      <div class="inspector-details-panel">
+        <div class="verdict-banner" id="verdictBanner">
+          <div class="verdict-text-group">
+            <h4 id="verdictTitle">VERDICT</h4>
+            <p id="verdictSub">Status description</p>
+          </div>
+          <div class="verdict-confidence-badge" id="verdictConfidence">--%</div>
+        </div>
+
+        <!-- Probability Meter -->
+        <div class="prob-meter-wrapper">
+          <div class="prob-meter-labels">
+            <span id="safePercentText">Safe: --%</span>
+            <span id="suspPercentText">Suspicious: --%</span>
+          </div>
+          <div class="prob-meter-bar">
+            <div class="prob-bar-safe" id="probBarSafe" style="width: 50%;"></div>
+            <div class="prob-bar-suspicious" id="probBarSuspicious" style="width: 50%;"></div>
+          </div>
+        </div>
+
+        <!-- Inference Latency -->
+        <div style="font-size:12px;color:var(--wa-text-secondary);display:flex;justify-content:space-between">
+          <span>Local Model Latency:</span>
+          <span style="font-weight:600;color:var(--wa-text-primary)" id="latencyText">-- ms</span>
+        </div>
+
+        <!-- Top Statistical Signals Table -->
+        <div>
+          <div class="signals-section-title">
+            <span>Primary Steganalysis Signals</span>
+            <span style="font-size:11px;color:var(--wa-text-secondary)">Feature Importance</span>
+          </div>
+          <table class="signals-table">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Calculated Value</th>
+                <th>Detection Method</th>
+              </tr>
+            </thead>
+            <tbody id="signalsTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- Viva & Model Performance Metrics Modal                                    -->
+<!-- ========================================================================= -->
+<div class="modal-overlay" id="metricsModal">
+  <div class="modal-card" style="width:940px; max-width:96vw; max-height:92vh;">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <span style="font-size:22px">📊</span>
+        <div>
+          <h3>Steganography Detection Model Evaluation & Viva Defense</h3>
+          <span style="font-size:12px;color:var(--wa-text-secondary)">8 Evaluation Parameters Specified by Evaluator • Trained on StegoImagesDataset</span>
+        </div>
+      </div>
+      <button class="icon-btn" id="closeMetricsModal" title="Close">✕</button>
+    </div>
+
+    <div class="modal-body" style="grid-template-columns: 1fr; gap: 14px; padding: 18px 20px;">
+      
+      <!-- Top Evaluator Checklist Banner -->
+      <div class="viva-banner-tag">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span>📋</span>
+          <strong>Evaluator Checklist (8 Parameters):</strong>
+        </div>
+        <div class="viva-check-badges">
+          <span class="viva-check-pill">1. Epochs: 25 ✓</span>
+          <span class="viva-check-pill">2. Batch Size: 32 ✓</span>
+          <span class="viva-check-pill">3. Seed: 42 ✓</span>
+          <span class="viva-check-pill">4. Confusion Matrix ✓</span>
+          <span class="viva-check-pill">5. Train/Val/Test Acc ✓</span>
+          <span class="viva-check-pill">6. Loss / Epoch ✓</span>
+          <span class="viva-check-pill">7. Algorithm Used ✓</span>
+          <span class="viva-check-pill">8. ROC Curve (0.993) ✓</span>
+        </div>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="viva-tab-bar" id="vivaTabBar">
+        <button class="viva-tab-btn active" data-tab="tab-overview">📊 8 Parameters Overview</button>
+        <button class="viva-tab-btn" data-tab="tab-curves">📈 Accuracy & Loss per Epoch</button>
+        <button class="viva-tab-btn" data-tab="tab-cm">🎯 Confusion Matrix & Metrics</button>
+        <button class="viva-tab-btn" data-tab="tab-roc">📉 ROC Curve (AUC = 0.993)</button>
+        <button class="viva-tab-btn" data-tab="tab-algorithm">🧠 Algorithm & Architecture</button>
+        <button class="viva-tab-btn" data-tab="tab-features">🔬 Steganalysis Features</button>
+      </div>
+
+      <!-- Tab 1: 8 Parameters Overview -->
+      <div class="viva-tab-pane active" id="tab-overview">
+        <div class="viva-reqs-grid">
+          
+          <!-- 1. Epochs -->
+          <div class="viva-req-card">
+            <div class="viva-req-header">
+              <span class="viva-req-title">Parameter 1</span>
+              <span class="viva-req-num-badge">Epochs</span>
+            </div>
+            <div class="viva-req-val" style="color:#38bdf8">25 Epochs</div>
+            <div class="viva-req-sub">Steady convergence reached at Epoch 18-20 with early stopping monitor</div>
+          </div>
+
+          <!-- 2. Batch Size -->
+          <div class="viva-req-card">
+            <div class="viva-req-header">
+              <span class="viva-req-title">Parameter 2</span>
+              <span class="viva-req-num-badge">Batch Size</span>
+            </div>
+            <div class="viva-req-val" style="color:#a855f7">32 Samples</div>
+            <div class="viva-req-sub">Mini-batch gradient descent for Adam optimization</div>
+          </div>
+
+          <!-- 3. Seed -->
+          <div class="viva-req-card">
+            <div class="viva-req-header">
+              <span class="viva-req-title">Parameter 3</span>
+              <span class="viva-req-num-badge">Seed</span>
+            </div>
+            <div class="viva-req-val" style="color:#f59e0b">Seed = 42</div>
+            <div class="viva-req-sub">Deterministic pseudo-random state for 100% reproducible results</div>
+          </div>
+
+          <!-- 4. Confusion Matrix Summary -->
+          <div class="viva-req-card">
+            <div class="viva-req-header">
+              <span class="viva-req-title">Parameter 4</span>
+              <span class="viva-req-num-badge">Confusion Matrix</span>
+            </div>
+            <div class="viva-req-val" style="color:#10b981">46 / 48 Correct</div>
+            <div class="viva-req-sub">TN: 23 | FP: 1 | FN: 1 | TP: 23 (95.83% accuracy)</div>
+          </div>
+
+          <!-- 5. Accuracies -->
+          <div class="viva-req-card">
+            <div class="viva-req-header">
+              <span class="viva-req-title">Parameter 5</span>
+              <span class="viva-req-num-badge">Acc / Epoch</span>
+            </div>
+            <div class="viva-req-val" style="color:#10b981">95.83% Test</div>
+            <div class="viva-req-sub">Train: 98.75% | Val: 96.88% | Test: 95.83%</div>
+          </div>
+
+          <!-- 6. Loss -->
+          <div class="viva-req-card">
+            <div class="viva-req-header">
+              <span class="viva-req-title">Parameter 6</span>
+              <span class="viva-req-num-badge">Loss / Epoch</span>
+            </div>
+            <div class="viva-req-val" style="color:#ef4444">0.0489 Loss</div>
+            <div class="viva-req-sub">Train Loss: 0.0489 | Val Loss: 0.0549 (Cross-Entropy)</div>
+          </div>
+
+          <!-- 7. Algorithm -->
+          <div class="viva-req-card">
+            <div class="viva-req-header">
+              <span class="viva-req-title">Parameter 7</span>
+              <span class="viva-req-num-badge">Algorithm</span>
+            </div>
+            <div class="viva-req-val" style="font-size:13.5px;color:#00a884">RF + Deep MLP</div>
+            <div class="viva-req-sub">300 Trees Ensemble & 128-64-32 Deep Neural Network</div>
+          </div>
+
+          <!-- 8. ROC Curve -->
+          <div class="viva-req-card">
+            <div class="viva-req-header">
+              <span class="viva-req-title">Parameter 8</span>
+              <span class="viva-req-num-badge">ROC Curve</span>
+            </div>
+            <div class="viva-req-val" style="color:#2563eb">AUC = 0.9931</div>
+            <div class="viva-req-sub">True Positive: 95.83% @ False Positive: 4.17%</div>
+          </div>
+
+        </div>
+
+        <!-- Quick Summary Box -->
+        <div style="background:var(--wa-input-bg);padding:14px;border-radius:10px;border:1px solid var(--wa-border);font-size:12.5px;color:var(--wa-text-secondary);line-height:1.5">
+          <strong style="color:var(--wa-text-primary)">📌 Evaluation Highlights for Examiners:</strong>
+          The model operates a hybrid steganalysis architecture: 24 statistical features (Chi-Square POV, RS-analysis, Shannon Entropy, Sample Pair Analysis) extracted per image, classified via a 300-tree Random Forest Pipeline and a Deep MLP neural classifier trained over 25 epochs (batch size 32, seed 42). Test set performance reached <strong>95.83% accuracy</strong> and <strong>0.9931 ROC-AUC</strong>, maintaining robust defense with a false alarm rate of only 4.17%.
+        </div>
+      </div>
+
+      <!-- Tab 2: Accuracy & Loss per Epoch -->
+      <div class="viva-tab-pane" id="tab-curves">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          
+          <!-- Accuracy Chart -->
+          <div class="viva-chart-box">
+            <div class="viva-chart-header">
+              <div class="viva-chart-title">
+                <span>📈</span> Parameter 5: Accuracy per Epoch
+              </div>
+              <div class="viva-chart-legend">
+                <span class="legend-item"><span class="legend-dot" style="background:#10b981"></span> Train (98.8%)</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#06b6d4"></span> Val (96.9%)</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#8b5cf6"></span> Test (95.8%)</span>
+              </div>
+            </div>
+            <div class="viva-svg-container" id="accuracyChartSvg">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Loss Chart -->
+          <div class="viva-chart-box">
+            <div class="viva-chart-header">
+              <div class="viva-chart-title">
+                <span>📉</span> Parameter 6: Loss per Epoch
+              </div>
+              <div class="viva-chart-legend">
+                <span class="legend-item"><span class="legend-dot" style="background:#ef4444"></span> Train Loss (0.049)</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#f97316"></span> Val Loss (0.055)</span>
+              </div>
+            </div>
+            <div class="viva-svg-container" id="lossChartSvg">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Full Epoch-wise Table -->
+        <div class="viva-chart-box" style="padding:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+            <div style="font-size:13px;font-weight:600;color:var(--wa-text-primary)">
+              📑 Complete Epoch-by-Epoch Convergence Table (Epochs 1 to 25 | Batch Size: 32 | Seed: 42)
+            </div>
+            <span style="font-size:11px;color:var(--wa-text-secondary)">Categorical Cross-Entropy Loss • Adam Optimizer (lr=0.001)</span>
+          </div>
+          <div class="epoch-table-box">
+            <table class="epoch-table" id="epochDataTable">
+              <thead>
+                <tr>
+                  <th>Epoch</th>
+                  <th>Training Loss</th>
+                  <th>Validation Loss</th>
+                  <th>Training Acc (%)</th>
+                  <th>Validation Acc (%)</th>
+                  <th>Testing Acc (%)</th>
+                  <th>Convergence State</th>
+                </tr>
+              </thead>
+              <tbody id="epochTableBody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Confusion Matrix & Classification Metrics -->
+      <div class="viva-tab-pane" id="tab-cm">
+        <div class="cm-container">
+          
+          <!-- Heatmap Matrix -->
+          <div class="cm-matrix-card">
+            <div style="font-size:13.5px;font-weight:600;color:var(--wa-text-primary);margin-bottom:6px">
+              🎯 Parameter 4: Confusion Matrix (Test Split n=48)
+            </div>
+            <div style="font-size:11.5px;color:var(--wa-text-secondary);margin-bottom:12px">
+              Binary Classification: 24 Clean Images vs 24 LSB-Steganography Images
+            </div>
+
+            <table class="cm-table">
+              <thead>
+                <tr>
+                  <th class="cm-header-cell"></th>
+                  <th class="cm-header-cell">Predicted: SAFE (Clean)</th>
+                  <th class="cm-header-cell">Predicted: SUSPICIOUS (Stego)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="cm-header-cell" style="text-align:right;padding-right:8px">Actual: Clean (Safe)</td>
+                  <td class="cm-cell tn">
+                    <div class="cm-count">23</div>
+                    <div class="cm-cell-label">True Negative (TN)</div>
+                    <div class="cm-cell-desc">Correctly classified clean images (95.8%)</div>
+                  </td>
+                  <td class="cm-cell fp">
+                    <div class="cm-count">1</div>
+                    <div class="cm-cell-label">False Positive (FP)</div>
+                    <div class="cm-cell-desc">False Alarm: clean flagged suspicious (4.2%)</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="cm-header-cell" style="text-align:right;padding-right:8px">Actual: Stego (Suspicious)</td>
+                  <td class="cm-cell fn">
+                    <div class="cm-count">1</div>
+                    <div class="cm-cell-label">False Negative (FN)</div>
+                    <div class="cm-cell-desc">Missed Detection: stego passed as safe (4.2%)</div>
+                  </td>
+                  <td class="cm-cell tp">
+                    <div class="cm-count">23</div>
+                    <div class="cm-cell-label">True Positive (TP)</div>
+                    <div class="cm-cell-desc">Correctly caught stego payloads (95.8%)</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Formula Breakdown -->
+          <div class="cm-metrics-side">
+            <div class="cm-formula-card">
+              <div class="cm-formula-info">
+                <span class="cm-formula-name">Overall Accuracy</span>
+                <span class="cm-formula-math">(TP + TN) / Total = (23 + 23) / 48</span>
+              </div>
+              <span class="cm-formula-val">95.83%</span>
+            </div>
+
+            <div class="cm-formula-card">
+              <div class="cm-formula-info">
+                <span class="cm-formula-name">Precision (Positive Predictive Value)</span>
+                <span class="cm-formula-math">TP / (TP + FP) = 23 / (23 + 1)</span>
+              </div>
+              <span class="cm-formula-val">95.83%</span>
+            </div>
+
+            <div class="cm-formula-card">
+              <div class="cm-formula-info">
+                <span class="cm-formula-name">Recall / Sensitivity (True Positive Rate)</span>
+                <span class="cm-formula-math">TP / (TP + FN) = 23 / (23 + 1)</span>
+              </div>
+              <span class="cm-formula-val">95.83%</span>
+            </div>
+
+            <div class="cm-formula-card">
+              <div class="cm-formula-info">
+                <span class="cm-formula-name">Specificity (True Negative Rate)</span>
+                <span class="cm-formula-math">TN / (TN + FP) = 23 / (23 + 1)</span>
+              </div>
+              <span class="cm-formula-val">95.83%</span>
+            </div>
+
+            <div class="cm-formula-card">
+              <div class="cm-formula-info">
+                <span class="cm-formula-name">F1-Score (Harmonic Mean)</span>
+                <span class="cm-formula-math">2 * (Precision * Recall) / (Precision + Recall)</span>
+              </div>
+              <span class="cm-formula-val">95.83%</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tab 4: ROC Curve -->
+      <div class="viva-tab-pane" id="tab-roc">
+        <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:16px">
+          
+          <!-- ROC SVG Chart -->
+          <div class="viva-chart-box">
+            <div class="viva-chart-header">
+              <div class="viva-chart-title">
+                <span>📉</span> Parameter 8: Receiver Operating Characteristic (ROC Curve)
+              </div>
+              <span style="font-size:12px;color:var(--wa-green-light);font-weight:700">AUC = 0.9931</span>
+            </div>
+            <div class="viva-svg-container" id="rocChartSvg" style="height:250px">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- ROC Analysis & Explanations -->
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="viva-chart-box">
+              <h4 style="font-size:13px;color:var(--wa-text-primary);margin-bottom:8px">🔍 ROC Curve Insights</h4>
+              <div style="font-size:12px;color:var(--wa-text-secondary);line-height:1.5;display:flex;flex-direction:column;gap:8px">
+                <div>
+                  <strong style="color:var(--wa-text-primary)">Area Under Curve (AUC = 0.9931):</strong>
+                  Indicates exceptional discriminatory capacity. An AUC above 0.90 is considered outstanding in academic forensics.
+                </div>
+                <div>
+                  <strong style="color:var(--wa-text-primary)">Operating Point (Threshold = 0.50):</strong>
+                  At 50% probability, True Positive Rate is <strong>95.83%</strong> with False Positive Rate of only <strong>4.17%</strong>.
+                </div>
+                <div>
+                  <strong style="color:var(--wa-text-primary)">Random Baseline (AUC = 0.50):</strong>
+                  The gray dashed diagonal represents a random guess classifier. Our model hugs the top-left boundary, proving effective separation.
+                </div>
+              </div>
+            </div>
+
+            <div class="viva-chart-box">
+              <h4 style="font-size:13px;color:var(--wa-text-primary);margin-bottom:6px">⚙️ Decision Threshold Tuning</h4>
+              <div style="font-size:11.5px;color:var(--wa-text-secondary);line-height:1.4">
+                In real-world WhatsApp deployment, thresholds can be tuned via <code>predict_proba</code>: higher threshold (0.70) eliminates false alarms on innocent family photos, while lower threshold (0.30) maximizes detection of covert malware payloads.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tab 5: Algorithm Used & Deep Architecture -->
+      <div class="viva-tab-pane" id="tab-algorithm">
+        <div class="arch-grid">
+          
+          <!-- Primary Ensemble Model -->
+          <div class="arch-card">
+            <h4>
+              <span>🌲</span> Primary Ensemble: Random Forest
+              <span class="arch-badge">Production Engine</span>
+            </h4>
+            <div class="arch-detail-row">
+              <span class="arch-detail-label">Model Class</span>
+              <span class="arch-detail-val">RandomForestClassifier</span>
+            </div>
+            <div class="arch-detail-row">
+              <span class="arch-detail-label">Number of Trees</span>
+              <span class="arch-detail-val">300 Estimators</span>
+            </div>
+            <div class="arch-detail-row">
+              <span class="arch-detail-label">Splitting Criterion</span>
+              <span class="arch-detail-val">Gini Impurity</span>
+            </div>
+            <div class="arch-detail-row">
+              <span class="arch-detail-label">Class Weighting</span>
+              <span class="arch-detail-val">Balanced</span>
+            </div>
+            <div class="arch-detail-row">
+              <span class="arch-detail-label">Pipeline Wrapper</span>
+              <span class="arch-detail-val">StandardScaler + RF</span>
+            </div>
+            <div class="arch-detail-row">
+              <span class="arch-detail-label">Inference Latency</span>
+              <span class="arch-detail-val">&lt; 35ms (CPU Native)</span>
+            </div>
+            <div style="font-size:11.5px;color:var(--wa-text-secondary);margin-top:6px;line-height:1.4">
+              <strong>Why Chosen:</strong> Ensemble trees resist overfitting on statistical steganalysis vectors and provide explicit feature importances for viva defense without requiring GPU compute.
+            </div>
+          </div>
+
+          <!-- Deep Neural Network Model -->
+          <div class="arch-card">
+            <h4>
+              <span>🧠</span> Deep Learning: MLP Steganalyzer
+              <span class="arch-badge">Neural Engine</span>
+            </h4>
+            <div class="arch-detail-row">
+              <span class="arch-detail-label">Architecture</span>
+              <span class="arch-detail-val">24 → 128 → 64 → 32 → 2</span>
+            </div>
+            <div class="arch-detail-row">
+              <span class="arch-detail-label">Epochs</span>
+              <span class="arch-detail-val">25 Epochs</span>
+            </div>
+            <div class="arch-detail-row">
+              <span class="arch-detail-label">Mini-Batch Size</span>
+              <span class="arch-detail-val">32 Samples</span>
+            </div>
+            <div class="arch-detail-row">
+              <span class="arch-detail-label">Random Seed</span>
+              <span class="arch-detail-val">Seed = 42</span>
+            </div>
+            <div class="arch-detail-row">
+              <span class="arch-detail-label">Optimizer</span>
+              <span class="arch-detail-val">Adam (lr = 0.001)</span>
+            </div>
+            <div class="arch-detail-row">
+              <span class="arch-detail-label">Loss Objective</span>
+              <span class="arch-detail-val">Cross-Entropy Loss</span>
+            </div>
+            <div class="layer-flow">
+              <span class="layer-node">Input (24)</span>
+              <span class="layer-arrow">→</span>
+              <span class="layer-node">Dense 128 (ReLU)</span>
+              <span class="layer-arrow">→</span>
+              <span class="layer-node">Dense 64 (ReLU)</span>
+              <span class="layer-arrow">→</span>
+              <span class="layer-node">Dense 32 (ReLU)</span>
+              <span class="layer-arrow">→</span>
+              <span class="layer-node">Softmax (2)</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Viva FAQ / Evaluator Q&A Accordion -->
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="viva-qa-item">
+            <div class="viva-qa-q">Q1: Why use Seed = 42?</div>
+            <div class="viva-qa-a">Setting a deterministic random seed ensures 100% reproducible train/validation/test splits, fold creation, and neural weight initialization so examiners get identical metrics when reproducing our training run.</div>
+          </div>
+          <div class="viva-qa-item">
+            <div class="viva-qa-q">Q2: Why Batch Size = 32 and 25 Epochs?</div>
+            <div class="viva-qa-a">Mini-batch size of 32 provides an optimal balance between gradient noise and compute efficiency. Over 25 epochs, training and validation loss smoothly converge to &lt; 0.055 without divergence or overfitting.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 6: Steganalysis Features -->
+      <div class="viva-tab-pane" id="tab-features">
+        <div style="margin-bottom:8px">
+          <h4 style="font-size:13px;margin-bottom:4px;color:var(--wa-text-primary)">Key Engineered Features in Detector</h4>
+          <span style="font-size:11.5px;color:var(--wa-text-secondary)">24 statistical steganalysis features calculated per image across RGB color channels</span>
+        </div>
+        <table class="signals-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Ensemble Weight</th>
+              <th>Scientific Principle</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>G_chi_square</strong></td><td>14.86%</td><td>Westfeld & Pfitzmann Chi-Square POV attack on Green channel (PoV parity flattening).</td></tr>
+            <tr><td><strong>R_rs_rate</strong></td><td>12.99%</td><td>Fridrich et al. Regular & Singular groups variation under mask on Red channel.</td></tr>
+            <tr><td><strong>B_lsb_entropy</strong></td><td>12.92%</td><td>Shannon entropy calculation on raw LSB bitplane of Blue channel (randomness spike).</td></tr>
+            <tr><td><strong>B_rs_rate</strong></td><td>11.61%</td><td>RS Steganalysis boundary shift rate on Blue channel.</td></tr>
+            <tr><td><strong>R_lsb_entropy</strong></td><td>9.86%</td><td>Shannon entropy of Red channel bit 0.</td></tr>
+            <tr><td><strong>G_lsb_entropy</strong></td><td>8.61%</td><td>Shannon entropy of Green channel bit 0.</td></tr>
+            <tr><td><strong>G_rs_rate</strong></td><td>7.47%</td><td>RS Steganalysis flip variation on Green channel.</td></tr>
+            <tr><td><strong>G_lsb_ones_ratio</strong></td><td>4.49%</td><td>Ratio of 1s to 0s in LSB plane (LSB substitution pushes ratio toward 0.5000).</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Load Sample Images Bundle & App Logic -->
+<script src="sample_images.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
